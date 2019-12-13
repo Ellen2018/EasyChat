@@ -2,7 +2,9 @@ package com.ellen.library.easy;
 
 import android.os.Handler;
 
-import com.ellen.library.messagehandler.ThreadRunMode;
+import com.ellen.library.easyinterface.ThreadRunMode;
+import com.ellen.library.easyinterface.receiver.ReceiverController;
+import com.ellen.library.easyinterface.receiver.ReceiverHandler;
 import com.ellen.library.runmode.RunMode;
 
 import java.util.concurrent.ExecutorService;
@@ -10,7 +12,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * 接收者(下游)
  */
-public abstract class Receiver<T> implements ThreadRunMode<Receiver> {
+public abstract class Receiver<T> implements ReceiverController<T>, ReceiverHandler<T>,ThreadRunMode<Receiver> {
 
     private RunMode runMode = RunMode.CURRENT_THREAD;
     private Sender sender;
@@ -29,7 +31,7 @@ public abstract class Receiver<T> implements ThreadRunMode<Receiver> {
         this.handler = handler;
     }
 
-    void receiverMessage(final T sendMessage) {
+    public void receiverMessage(final T sendMessage) {
         if (runMode.equals(RunMode.REUSABLE_THREAD)) {
            executorService.execute(new Runnable() {
                @Override
@@ -59,6 +61,66 @@ public abstract class Receiver<T> implements ThreadRunMode<Receiver> {
     }
 
     @Override
+    public void receiverErrMessage(final Throwable throwable) {
+        if (runMode.equals(RunMode.REUSABLE_THREAD)) {
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    handleErrMessage(throwable);
+                }
+            });
+        } else if (runMode.equals(RunMode.NEW_THREAD)) {
+            new Thread(){
+                @Override
+                public void run() {
+                    handleErrMessage(throwable);
+                }
+            }.start();
+        } else if (runMode.equals(RunMode.CURRENT_THREAD)) {
+            handleErrMessage(throwable);
+        } else if (runMode.equals(RunMode.MAIN_THREAD)) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    handleErrMessage(throwable);
+                }
+            });
+        } else {
+            handleErrMessage(throwable);
+        }
+    }
+
+    @Override
+    public void receiverCompeteMessage() {
+        if (runMode.equals(RunMode.REUSABLE_THREAD)) {
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    complete();
+                }
+            });
+        } else if (runMode.equals(RunMode.NEW_THREAD)) {
+            new Thread(){
+                @Override
+                public void run() {
+                    complete();
+                }
+            }.start();
+        } else if (runMode.equals(RunMode.CURRENT_THREAD)) {
+            complete();
+        } else if (runMode.equals(RunMode.MAIN_THREAD)) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    complete();
+                }
+            });
+        } else {
+            complete();
+        }
+    }
+
+    @Override
     public Receiver runOn(RunMode runMode) {
         this.runMode = runMode;
         return this;
@@ -67,6 +129,4 @@ public abstract class Receiver<T> implements ThreadRunMode<Receiver> {
     public void start() {
         sender.strat();
     }
-
-    public abstract void handleMessage(T message);
 }

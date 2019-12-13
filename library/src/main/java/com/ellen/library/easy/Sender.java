@@ -3,7 +3,9 @@ package com.ellen.library.easy;
 import android.os.Handler;
 import android.util.Log;
 
-import com.ellen.library.messagehandler.ThreadRunMode;
+import com.ellen.library.easyinterface.sender.SenderController;
+import com.ellen.library.easyinterface.ThreadRunMode;
+import com.ellen.library.easyinterface.sender.SenderHandler;
 import com.ellen.library.runmode.RunMode;
 
 import java.util.concurrent.ExecutorService;
@@ -13,23 +15,54 @@ import java.util.concurrent.Executors;
  * 发送者(上游)
  * Sender的泛型代表向下发送怎样类型的消息
  */
-public abstract class Sender<T> implements ThreadRunMode<Sender> {
+public abstract class Sender<T> implements SenderHandler<T>,ThreadRunMode<Sender> {
 
     private Messenger messenger;
     private Receiver receiver;
     private RunMode runMode = RunMode.CURRENT_THREAD;
     private Handler handler = new Handler();
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
+    private SenderController<T> senderController;
 
-    public abstract void handlerInstruction();
+    public Sender(){
+        senderController = new SenderController<T>() {
 
-    public void sendToNextMessage(T sendMessage){
-         if(messenger != null){
-            messenger.receiverPreMessage(sendMessage);
-         }
-         if(receiver != null){
-             receiver.receiverMessage(sendMessage);
-         }
+            @Override
+            public void sendMessageToNext(T message) {
+               if(messenger != null){
+                   messenger.receiverPreMessage(message);
+                   return;
+               }
+               if(receiver != null){
+                   receiver.receiverMessage(message);
+                   return;
+               }
+            }
+
+            @Override
+            public void sendErrMessageToNext(Throwable throwable) {
+                if(messenger != null){
+                    messenger.receiverPreErrMessage(throwable);
+                    return;
+                }
+                if(receiver != null){
+                    receiver.receiverErrMessage(throwable);
+                    return;
+                }
+            }
+
+            @Override
+            public void complete() {
+                if(messenger != null){
+                    messenger.receiverCompeteMessage();
+                    return;
+                }
+                if(receiver != null){
+                    receiver.receiverCompeteMessage();
+                    return;
+                }
+            }
+        };
     }
 
     public Receiver setReceiver(Receiver receiver){
@@ -48,26 +81,23 @@ public abstract class Sender<T> implements ThreadRunMode<Sender> {
     }
 
     public void strat(){
-        Log.e("Ellen2018","线程模式:"+runMode);
-        Log.e("Ellen2018","开始异步");
         if(runMode.equals(RunMode.REUSABLE_THREAD)){
             //工作于IO线程
           executorService.execute(new Runnable() {
               @Override
               public void run() {
-                  handlerInstruction();
+                  handlerInstruction(senderController);
               }
           });
         }else if(runMode.equals(RunMode.CURRENT_THREAD)){
             //工作于当前线程
-            Log.e("Ellen2018","CURRENT_THREAD");
-            handlerInstruction();
+            handlerInstruction(senderController);
         }else if(runMode.equals(RunMode.NEW_THREAD)){
             //工作于新的线程
             new Thread(){
                 @Override
                 public void run() {
-                    handlerInstruction();
+                    handlerInstruction(senderController);
                 }
             }.start();
         }else if(runMode.equals(RunMode.MAIN_THREAD)){
@@ -75,11 +105,11 @@ public abstract class Sender<T> implements ThreadRunMode<Sender> {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    handlerInstruction();
+                    handlerInstruction(senderController);
                 }
             });
         }else {
-            handlerInstruction();
+            handlerInstruction(senderController);
         }
     }
 

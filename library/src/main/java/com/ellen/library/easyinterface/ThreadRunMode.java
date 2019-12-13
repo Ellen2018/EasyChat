@@ -1,4 +1,4 @@
-package com.ellen.library.messagehandler;
+package com.ellen.library.easyinterface;
 
 import com.ellen.library.runmode.RunMode;
 
