@@ -4,7 +4,6 @@ import android.os.Handler;
 
 import com.ellen.library.easyinterface.ThreadRunMode;
 import com.ellen.library.easyinterface.receiver.ReceiverController;
-import com.ellen.library.easyinterface.receiver.ReceiverHandler;
 import com.ellen.library.runmode.RunMode;
 
 import java.util.concurrent.ExecutorService;
@@ -12,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * 接收者(下游)
  */
-public abstract class Receiver<T> implements ReceiverController<T>, ReceiverHandler<T>,ThreadRunMode<Receiver> {
+public abstract class Receiver<T> extends ReceiverController<T> implements ThreadRunMode<Receiver> {
 
     private RunMode runMode = RunMode.CURRENT_THREAD;
     private Sender sender;
@@ -31,7 +30,8 @@ public abstract class Receiver<T> implements ReceiverController<T>, ReceiverHand
         this.handler = handler;
     }
 
-    public void receiverMessage(final T sendMessage) {
+    @Override
+    protected void receiverMessage(final T sendMessage) {
         if (runMode.equals(RunMode.REUSABLE_THREAD)) {
            executorService.execute(new Runnable() {
                @Override
@@ -61,7 +61,7 @@ public abstract class Receiver<T> implements ReceiverController<T>, ReceiverHand
     }
 
     @Override
-    public void receiverErrMessage(final Throwable throwable) {
+    protected void receiverErrMessage(final Throwable throwable) {
         if (runMode.equals(RunMode.REUSABLE_THREAD)) {
             executorService.execute(new Runnable() {
                 @Override
@@ -91,7 +91,7 @@ public abstract class Receiver<T> implements ReceiverController<T>, ReceiverHand
     }
 
     @Override
-    public void receiverCompeteMessage() {
+    protected void receiverCompeteMessage() {
         if (runMode.equals(RunMode.REUSABLE_THREAD)) {
             executorService.execute(new Runnable() {
                 @Override

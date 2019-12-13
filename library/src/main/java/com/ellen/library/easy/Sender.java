@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
  * 发送者(上游)
  * Sender的泛型代表向下发送怎样类型的消息
  */
-public abstract class Sender<T> implements SenderHandler<T>,ThreadRunMode<Sender> {
+public abstract class Sender<T> extends SenderHandler<T> implements ThreadRunMode<Sender> {
 
     private Messenger messenger;
     private Receiver receiver;

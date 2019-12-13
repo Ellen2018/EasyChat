@@ -5,7 +5,6 @@ import android.os.Handler;
 import com.ellen.library.easyinterface.messenger.MessengerHandler;
 import com.ellen.library.easyinterface.messenger.MessengerSender;
 import com.ellen.library.easyinterface.ThreadRunMode;
-import com.ellen.library.easyinterface.messenger.MessengerReceiver;
 import com.ellen.library.runmode.RunMode;
 
 import java.util.concurrent.ExecutorService;
@@ -13,7 +12,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * 传递者(中游)
  */
-public abstract class Messenger<T, E> implements MessengerReceiver<T>, MessengerHandler<T>, ThreadRunMode<Messenger> {
+public abstract class Messenger<T, E> extends MessengerHandler<T> implements ThreadRunMode<Messenger> {
 
     private Messenger messenger;
     private RunMode runMode = RunMode.CURRENT_THREAD;
@@ -76,7 +75,7 @@ public abstract class Messenger<T, E> implements MessengerReceiver<T>, Messenger
     }
 
     @Override
-    public void receiverPreMessage(final T sendMessage) {
+    protected void receiverPreMessage(final T sendMessage) {
         if (runMode == RunMode.REUSABLE_THREAD) {
             //工作于IO线程
             executorService.execute(new Runnable() {
@@ -110,7 +109,7 @@ public abstract class Messenger<T, E> implements MessengerReceiver<T>, Messenger
     }
 
     @Override
-    public void receiverPreErrMessage(final Throwable throwable) {
+    protected void receiverPreErrMessage(final Throwable throwable) {
         if (runMode == RunMode.REUSABLE_THREAD) {
             //工作于IO线程
             executorService.execute(new Runnable() {
@@ -153,7 +152,7 @@ public abstract class Messenger<T, E> implements MessengerReceiver<T>, Messenger
     }
 
     @Override
-    public void handlerCompete(MessengerSender messengerSender) {
+    protected void handlerCompete(MessengerSender messengerSender) {
         if(messenger != null){
             messenger.receiverCompeteMessage();
         }
@@ -163,7 +162,7 @@ public abstract class Messenger<T, E> implements MessengerReceiver<T>, Messenger
     }
 
     @Override
-    public void receiverCompeteMessage() {
+    protected void receiverCompeteMessage() {
         if (runMode == RunMode.REUSABLE_THREAD) {
             //工作于IO线程
             executorService.execute(new Runnable() {
