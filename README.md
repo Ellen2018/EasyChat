@@ -1,4 +1,4 @@
-> 是否觉得RxJava太难上手呢?不妨使用此库吧，易于理解，易于使用,还能完成RxJava做不到的。
+> 是否觉得RxJava太难上手呢?不妨使用此库吧，易于理解，易于使用,还能完成RxJava做不到的。这个库的最大好处就是容易理解，并且线程环境易于控制和切换。
 
 ## 0.如何导入？
 
@@ -135,6 +135,7 @@ runOn方法中可以传递一个枚举参数，这个枚举的4种类型如下:
             @Override
             protected void handleMessage(MessengerSender messengerSender, Integer receiverMessage) {
                  String s = String.valueOf(receiverMessage);
+                 //发送消息给下一级
                  messengerSender.sendMessageToNext(s);
             }
 
@@ -164,3 +165,7 @@ runOn方法中可以传递一个枚举参数，这个枚举的4种类型如下:
         //指定Receiver的工作环境 
         .runOn(RunMode.MAIN_THREAD)
         .start();
+
+### 场景3:需要请求完3个接口才能更新UI(并行)
+
+&emsp;&emsp;这部分待笔者封装api再写
