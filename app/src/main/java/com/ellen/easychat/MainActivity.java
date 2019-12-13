@@ -31,14 +31,14 @@ public class MainActivity extends AppCompatActivity {
         }
         .runOn(RunMode.REUSABLE_THREAD)
         .setMessenger(new Messenger<Integer,String>() {
+
             @Override
-            protected void handleMessage(MessengerSender messengerSender, Integer receiverMessage) {
-                 String s = String.valueOf(receiverMessage);
-                 messengerSender.sendMessageToNext(s);
+            protected void handleMessage(MessengerSender<String> messengerSender, Integer receiverMessage) {
+                messengerSender.sendMessageToNext(String.valueOf(receiverMessage));
             }
 
             @Override
-            protected void handleErrMessage(MessengerSender messengerSender, Throwable throwable) {
+            protected void handleErrMessage(MessengerSender<String> messengerSender, Throwable throwable) {
 
             }
         })

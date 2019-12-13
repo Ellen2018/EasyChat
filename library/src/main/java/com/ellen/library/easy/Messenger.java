@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * 传递者(中游)
  */
-public abstract class Messenger<T, E> extends MessengerHandler<T> implements ThreadRunMode<Messenger> {
+public abstract class Messenger<T, E> extends MessengerHandler<T,E> implements ThreadRunMode<Messenger> {
 
     private Messenger messenger;
     private RunMode runMode = RunMode.CURRENT_THREAD;
@@ -20,10 +20,10 @@ public abstract class Messenger<T, E> extends MessengerHandler<T> implements Thr
     private Sender sender;
     private Handler handler;
     private ExecutorService executorService;
-    private MessengerSender<T, E> messengerSender;
+    private MessengerSender<E> messengerSender;
 
     public Messenger() {
-        messengerSender = new MessengerSender<T, E>() {
+        messengerSender = new MessengerSender<E>() {
 
             @Override
             public void sendMessageToNext(E message) {

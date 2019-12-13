@@ -1,6 +1,6 @@
 package com.ellen.library.easyinterface.messenger;
 
-public interface MessengerSender<T,E> {
+public interface MessengerSender<E> {
 
     /**
      * 将消息发送给下游
