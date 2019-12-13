@@ -2,9 +2,9 @@
 
 ## 0.如何导入？
 
-[![](https://jitpack.io/v/Ellen2018/EasyChat.svg)](https://jitpack.io/#Ellen2018/EasyChat)
+![](https://oscimg.oschina.net/oscnet/up-561b52646e444c676eebab09b712d9220e3.png)
 
-&emsp;&emsp;首先你需要在项目的build.gradle中配置以下代码：  
+&emsp;&emsp;首先你需要在项目的build.gradle中配置以下代码：
 
     allprojects {
 		repositories {
@@ -13,7 +13,7 @@
 		}
 	}
 
-&emsp;&emsp;然后你在要使用该库的module中添加以下依赖:  
+&emsp;&emsp;然后你在要使用该库的module中添加以下依赖:
 
      implementation 'com.github.Ellen2018:EasyChat:x.y.z'
 
@@ -28,19 +28,19 @@
 
 ### Sender说明
 
-&emsp;&emsp;它的泛型指的是它能发送怎样类型的消息,它直接决定handlerInstruction方法中SenderController能发送怎样类型的消息。  
-&emsp;&emsp;handlerInstruction方法是Sender专用的处理函数,它的工作环境直接由runOn决定。  
-&emsp;&emsp;SenderController是Sender用来向下一级发送消息的控制器对象,handlerInstruction方法中以参数的方式传递过去了，通过SenderController我们可以向下一级发送消息(sendMessageToNext方法)，错误消息(sendErrMessageToNext方法)，完成消息(complete方法)等。  
+&emsp;&emsp;它的泛型指的是它能发送怎样类型的消息,它直接决定handlerInstruction方法中SenderController能发送怎样类型的消息。
+&emsp;&emsp;handlerInstruction方法是Sender专用的处理函数,它的工作环境直接由runOn决定。
+&emsp;&emsp;SenderController是Sender用来向下一级发送消息的控制器对象,handlerInstruction方法中以参数的方式传递过去了，通过SenderController我们可以向下一级发送消息(sendMessageToNext方法)，错误消息(sendErrMessageToNext方法)，完成消息(complete方法)等。
 &emsp;&emsp;详细用法看下面代码示例。
 
 ### Messgener说明
 
-&emsp;&emsp;使用它需要两个泛型，第一个泛型参数代表接收怎样类型的消息(注意这里的类型指定要与上级保持一致,不然使用的时候会发生ClassCaseException),第二个泛型参数代表它要发送怎样类型的消息，其实说白了就是拦截者能拦截什么类型的消息和发送什么类型的消息。  
+&emsp;&emsp;使用它需要两个泛型，第一个泛型参数代表接收怎样类型的消息(注意这里的类型指定要与上级保持一致,不然使用的时候会发生ClassCaseException),第二个泛型参数代表它要发送怎样类型的消息，其实说白了就是拦截者能拦截什么类型的消息和发送什么类型的消息。
 &emsp;&emsp;详细用法看下面代码示例。
 
-### Receiver说明  
+### Receiver说明
 
-&emsp;&emsp;它的泛型指的是它能收到怎样类型的消息(也是与上一级保持一致,不然使用的时候会发生ClassCaseException)。  
+&emsp;&emsp;它的泛型指的是它能收到怎样类型的消息(也是与上一级保持一致,不然使用的时候会发生ClassCaseException)。
 &emsp;&emsp;详细用法看下面代码示例。
 
 ### 关于三者的runOn方法说明
@@ -70,7 +70,7 @@ runOn方法中可以传递一个枚举参数，这个枚举的4种类型如下:
 
 &emsp;&emsp;代码示例:
 
-    //这是笔者请求网络视频数据的一段代码(MVP架构) 
+    //这是笔者请求网络视频数据的一段代码(MVP架构)
     new Sender<VideoBean>(){//这里的VideoBean代表当前Sender发送的消息类型为VideoBean
             @Override
             protected void handlerInstruction(SenderController<VideoBean> senderController) {
@@ -162,7 +162,7 @@ runOn方法中可以传递一个枚举参数，这个枚举的4种类型如下:
 
             }
         })
-        //指定Receiver的工作环境 
+        //指定Receiver的工作环境
         .runOn(RunMode.MAIN_THREAD)
         .start();
 

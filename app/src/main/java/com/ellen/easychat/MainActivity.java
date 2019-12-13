@@ -17,67 +17,48 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //上游
-        new Sender<String>() {
+        test();
+    }
+
+    public void test(){
+        final byte data = 3;
+        new Sender<Integer>(){
             @Override
-            public void handlerInstruction(SenderController<String> senderController) {
-                Log.e("Ellen2018", "工作的线程-发送者:" + Thread.currentThread().getName());
-                senderController.sendErrMessageToNext(new Throwable("网络错误"));
-                senderController.sendMessageToNext("hello");
-                senderController.complete();
+            protected void handlerInstruction(SenderController<Integer> senderController) {
+                Integer data1 = new Integer(data);
+                senderController.sendMessageToNext(data1);
             }
         }
-                .runOn(RunMode.REUSABLE_THREAD)
-                .setMessenger(new Messenger() {
-                    @Override
-                    public void handleMessage(MessengerSender messengerSender, Object receiverMessage) {
-                        Log.e("Ellen2018", "工作的线程-拦截者1:" + Thread.currentThread().getName());
-                        Log.e("Ellen2018","收到的消息-拦截者1:"+receiverMessage);
-                        messengerSender.sendMessageToNext(receiverMessage);
-                    }
+        .runOn(RunMode.REUSABLE_THREAD)
+        .setMessenger(new Messenger<Integer,String>() {
+            @Override
+            protected void handleMessage(MessengerSender messengerSender, Integer receiverMessage) {
+                 String s = String.valueOf(receiverMessage);
+                 messengerSender.sendMessageToNext(s);
+            }
 
-                    @Override
-                    public void handleErrMessage(MessengerSender messengerSender, Throwable throwable) {
-                        Log.e("Ellen2018", "工作的线程-拦截者1:" + Thread.currentThread().getName());
-                        Log.e("Ellen2018","收到的错误消息-拦截者1:"+throwable);
-                        messengerSender.sendErrMessageToNext(throwable);
-                    }
+            @Override
+            protected void handleErrMessage(MessengerSender messengerSender, Throwable throwable) {
 
-                })
-                .setMessenger(new Messenger() {
-                    @Override
-                    public void handleMessage(MessengerSender messengerSender, Object receiverMessage) {
-                        Log.e("Ellen2018", "工作的线程-拦截者2:" + Thread.currentThread().getName());
-                        Log.e("Ellen2018","收到的消息-拦截者2:"+receiverMessage);
-                        messengerSender.sendMessageToNext(receiverMessage);
-                    }
+            }
+        })
+        .runOn(RunMode.REUSABLE_THREAD)
+        .setReceiver(new Receiver<String>() {
+            @Override
+            protected void handleMessage(String message) {
+                Log.e("Ellen2018","收到消息:"+message);
+            }
 
-                    @Override
-                    public void handleErrMessage(MessengerSender messengerSender, Throwable throwable) {
-                        Log.e("Ellen2018", "工作的线程-拦截者2:" + Thread.currentThread().getName());
-                        Log.e("Ellen2018","收到的错误消息-拦截者2:"+throwable);
-                        messengerSender.sendErrMessageToNext(throwable);
-                    }
-                })
-                .setReceiver(new Receiver<String>() {
-                    @Override
-                    public void handleMessage(String message) {
-                        Log.e("Ellen2018", "工作的线程-接收者:" + Thread.currentThread().getName());
-                        Log.e("Ellen2018", "接收的信息-接收者:" + message);
-                    }
+            @Override
+            protected void handleErrMessage(Throwable throwable) {
 
-                    @Override
-                    public void handleErrMessage(Throwable throwable) {
-                        Log.e("Ellen2018", "工作的线程-接收者:" + Thread.currentThread().getName());
-                        Log.e("Ellen2018", "错误信息-接收者:" + throwable.getMessage());
-                    }
+            }
 
-                    @Override
-                    public void complete() {
-                        Log.e("Ellen2018", "工作的线程-接收者:" + Thread.currentThread().getName());
-                        Log.e("Ellen2018", "完成-接收者");
-                    }
-                })
-                .runOn(RunMode.MAIN_THREAD).start();
+            @Override
+            protected void complete() {
+
+            }
+        }).runOn(RunMode.MAIN_THREAD).start();
+
     }
 }
