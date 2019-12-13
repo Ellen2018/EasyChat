@@ -129,22 +129,19 @@ runOn方法中可以传递一个枚举参数，这个枚举的4种类型如下:
                 senderController.sendMessageToNext(data1);
             }
         }
-        //指定Sender工作环境
         .runOn(RunMode.REUSABLE_THREAD)
         .setMessenger(new Messenger<Integer,String>() {
+
             @Override
-            protected void handleMessage(MessengerSender messengerSender, Integer receiverMessage) {
-                 String s = String.valueOf(receiverMessage);
-                 //发送消息给下一级
-                 messengerSender.sendMessageToNext(s);
+            protected void handleMessage(MessengerSender<String> messengerSender, Integer receiverMessage) {
+                messengerSender.sendMessageToNext(String.valueOf(receiverMessage));
             }
 
             @Override
-            protected void handleErrMessage(MessengerSender messengerSender, Throwable throwable) {
+            protected void handleErrMessage(MessengerSender<String> messengerSender, Throwable throwable) {
 
             }
         })
-        //指定Messenger的工作环境
         .runOn(RunMode.REUSABLE_THREAD)
         .setReceiver(new Receiver<String>() {
             @Override
@@ -162,7 +159,6 @@ runOn方法中可以传递一个枚举参数，这个枚举的4种类型如下:
 
             }
         })
-        //指定Receiver的工作环境
         .runOn(RunMode.MAIN_THREAD)
         .start();
 
