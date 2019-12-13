@@ -1,5 +1,24 @@
 > 是否觉得RxJava太难上手呢?不妨使用此库吧，易于理解，易于使用,还能完成RxJava做不到的。
 
+## 0.如何导入？
+
+[![](https://jitpack.io/v/Ellen2018/EasyChat.svg)](https://jitpack.io/#Ellen2018/EasyChat)
+
+&emsp;&emsp;首先你需要在项目的build.gradle中配置以下代码：  
+
+    allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }//加上这句即可
+		}
+	}
+
+&emsp;&emsp;然后你在要使用该库的module中添加以下依赖:  
+
+     implementation 'com.github.Ellen2018:EasyChat:x.y.z'
+
+&emsp;&emsp;x,y,z是笔者库的版本值，例如：1.0.0
+
 ## 1.此库的原理
 ![EasyChat思维理论](https://oscimg.oschina.net/oscnet/up-9a2e85bc1cdaf4f2222a36d67e5299045d6.png)
 
