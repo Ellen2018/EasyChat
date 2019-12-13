@@ -6,30 +6,29 @@ import android.util.Log;
 import com.ellen.library.messagehandler.ThreadRunMode;
 import com.ellen.library.runmode.RunMode;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * 发送者(上游)
+ * Sender的泛型代表向下发送怎样类型的消息
  */
 public abstract class Sender<T> implements ThreadRunMode<Sender> {
 
-    private  T t;
     private Messenger messenger;
     private Receiver receiver;
     private RunMode runMode = RunMode.CURRENT_THREAD;
     private Handler handler = new Handler();
+    private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-    public Sender(T t){
-        this.t = t;
-    }
+    public abstract void handlerInstruction();
 
-    public abstract void handlerInstruction(T t);
-
-    public void sendToNextMessage(Object sendMessage){
+    public void sendToNextMessage(T sendMessage){
          if(messenger != null){
-             Log.e("Ellen2018","发送者发送消息");
-            messenger.sendMessage(sendMessage);
+            messenger.receiverPreMessage(sendMessage);
          }
          if(receiver != null){
-             receiver.sendMessage(sendMessage);
+             receiver.receiverMessage(sendMessage);
          }
     }
 
@@ -44,36 +43,43 @@ public abstract class Sender<T> implements ThreadRunMode<Sender> {
         this.messenger = messenger;
         this.messenger.setSender(this);
         this.messenger.setHandler(handler);
+        this.messenger.setExecutorService(executorService);
         return this.messenger;
     }
 
     public void strat(){
         Log.e("Ellen2018","线程模式:"+runMode);
         Log.e("Ellen2018","开始异步");
-        if(runMode.equals(RunMode.IO)){
+        if(runMode.equals(RunMode.REUSABLE_THREAD)){
             //工作于IO线程
-            new Thread(){
-                @Override
-                public void run() {
-                    handlerInstruction(t);
-                }
-            }.start();
+          executorService.execute(new Runnable() {
+              @Override
+              public void run() {
+                  handlerInstruction();
+              }
+          });
         }else if(runMode.equals(RunMode.CURRENT_THREAD)){
             //工作于当前线程
             Log.e("Ellen2018","CURRENT_THREAD");
-            handlerInstruction(t);
+            handlerInstruction();
         }else if(runMode.equals(RunMode.NEW_THREAD)){
             //工作于新的线程
+            new Thread(){
+                @Override
+                public void run() {
+                    handlerInstruction();
+                }
+            }.start();
         }else if(runMode.equals(RunMode.MAIN_THREAD)){
             //工作于主线程
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    handlerInstruction(t);
+                    handlerInstruction();
                 }
             });
         }else {
-            handlerInstruction(t);
+            handlerInstruction();
         }
     }
 

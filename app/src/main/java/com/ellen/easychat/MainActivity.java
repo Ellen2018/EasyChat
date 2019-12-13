@@ -16,24 +16,34 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //上游
-        new Sender<String>("ss") {
+        new Sender<Integer>() {
+
             @Override
-            public void handlerInstruction(String s) {
-                Log.e("Ellen20181","收到消息:"+s);
-                Log.e("Ellen2018","线程名字:"+Thread.currentThread().getName());
-                sendToNextMessage(s);
+            public void handlerInstruction() {
+                Log.e("Ellen2018","当前线程名字:"+Thread.currentThread().getName());
+                sendToNextMessage(3);
             }
         }
-                .runOn(RunMode.IO)
-                //下游
-                .setReceiver(new Receiver() {
+                .runOn(RunMode.REUSABLE_THREAD)
+                //中游
+                .setMessenger(new Messenger<Integer,String>() {
                     @Override
-                    public void receiverMessage(Object receiverMessage) {
-                        Log.e("Ellen20183","收到消息:"+receiverMessage);
-                        Log.e("Ellen2018","线程名字:"+Thread.currentThread().getName());
+                    public void handleMessage(Integer receiverMessage) {
+                        Log.e("Ellen2018","收到的消息:"+receiverMessage);
+                        Log.e("Ellen2018","当前线程名字:"+Thread.currentThread().getName());
+                        sendMessageToNext("呵呵");
                     }
-
-                }).runOn(RunMode.MAIN_THREAD)
+                })
+                .runOn(RunMode.REUSABLE_THREAD)
+                //下游
+                .setReceiver(new Receiver<String>() {
+                    @Override
+                    public void handleMessage(String message) {
+                        Log.e("Ellen2018","收到的消息:"+message);
+                        Log.e("Ellen2018","当前线程名字:"+Thread.currentThread().getName());
+                    }
+                })
+                .runOn(RunMode.MAIN_THREAD)
                 .start();
 
     }

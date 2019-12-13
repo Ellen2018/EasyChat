@@ -6,18 +6,25 @@ import com.ellen.library.messagehandler.HandlerMessage;
 import com.ellen.library.messagehandler.ThreadRunMode;
 import com.ellen.library.runmode.RunMode;
 
+import java.util.concurrent.ExecutorService;
+
 /**
  * 传递者(中游)
  */
-public abstract class Messenger<T> implements HandlerMessage<T>, ThreadRunMode<Messenger> {
+public abstract class Messenger<T,E> implements HandlerMessage<T,E>, ThreadRunMode<Messenger> {
 
     private Messenger messenger;
     private RunMode runMode = RunMode.CURRENT_THREAD;
     private Receiver receiver;
     private Sender sender;
     private Handler handler;
+    private ExecutorService executorService;
 
-    public void setHandler(Handler handler){
+    void setExecutorService(ExecutorService executorService){
+        this.executorService = executorService;
+    }
+
+    void setHandler(Handler handler){
         this.handler = handler;
     }
 
@@ -33,45 +40,52 @@ public abstract class Messenger<T> implements HandlerMessage<T>, ThreadRunMode<M
     public Receiver setReceiver(Receiver receiver){
         this.receiver = receiver;
         this.receiver.setSender(sender);
+        this.receiver.setHandler(handler);
         return receiver;
     }
 
     @Override
-    public void sendMessage(final T sendMessage) {
-        if(runMode == RunMode.IO){
+    public void receiverPreMessage(final T sendMessage) {
+        if(runMode == RunMode.REUSABLE_THREAD){
             //工作于IO线程
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    handleMessage(sendMessage);
+                }
+            });
+        }else if(runMode == RunMode.CURRENT_THREAD){
+            //工作于当前线程
+            handleMessage(sendMessage);
+        }else if(runMode == RunMode.NEW_THREAD){
+            //工作于新的线程
             new Thread(){
                 @Override
                 public void run() {
-                    receiverMessage(sendMessage);
+                    handleMessage(sendMessage);
                 }
             }.start();
-        }else if(runMode == RunMode.CURRENT_THREAD){
-            //工作于当前线程
-            receiverMessage(sendMessage);
-        }else if(runMode == RunMode.NEW_THREAD){
-            //工作于新的线程
         }else if(runMode == RunMode.MAIN_THREAD){
             //工作于主线程
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                   receiverMessage(sendMessage);
+                   handleMessage(sendMessage);
                 }
             });
         }else {
-            receiverMessage(sendMessage);
+            handleMessage(sendMessage);
         }
     }
 
     @Override
-    public void sendMessageToNext(Object message) {
+    public void sendMessageToNext(E message) {
         if(messenger != null){
-            messenger.sendMessage(message);
+            messenger.receiverPreMessage(message);
             return;
         }
         if(receiver != null){
-            receiver.sendMessage(message);
+            receiver.receiverMessage(message);
         }
     }
 
@@ -79,5 +93,9 @@ public abstract class Messenger<T> implements HandlerMessage<T>, ThreadRunMode<M
     public Messenger runOn(RunMode runMode) {
         this.runMode = runMode;
         return this;
+    }
+
+    public void start(){
+        sender.strat();
     }
 }
