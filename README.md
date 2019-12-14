@@ -2,8 +2,6 @@
 
 ## 0.如何导入？
 
-![](https://oscimg.oschina.net/oscnet/up-561b52646e444c676eebab09b712d9220e3.png)
-
 &emsp;&emsp;首先你需要在项目的build.gradle中配置以下代码：
 
     allprojects {
@@ -20,7 +18,7 @@
 &emsp;&emsp;x,y,z是笔者库的版本值，例如：1.0.0
 
 ## 1.此库的原理
-![EasyChat思维理论](https://oscimg.oschina.net/oscnet/up-9a2e85bc1cdaf4f2222a36d67e5299045d6.png)
+![](https://oscimg.oschina.net/oscnet/up-561b52646e444c676eebab09b712d9220e3.png)
 
 ## 2.api说明
 
