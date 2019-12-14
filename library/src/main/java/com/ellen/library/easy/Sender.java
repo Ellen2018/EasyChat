@@ -30,11 +30,9 @@ public abstract class Sender<T> extends SenderHandler<T> implements ThreadRunMod
             public void sendMessageToNext(T message) {
                if(messenger != null){
                    messenger.receiverPreMessage(message);
-                   return;
                }
                if(receiver != null){
                    receiver.receiverMessage(message);
-                   return;
                }
             }
 
@@ -42,11 +40,9 @@ public abstract class Sender<T> extends SenderHandler<T> implements ThreadRunMod
             public void sendErrMessageToNext(Throwable throwable) {
                 if(messenger != null){
                     messenger.receiverPreErrMessage(throwable);
-                    return;
                 }
                 if(receiver != null){
                     receiver.receiverErrMessage(throwable);
-                    return;
                 }
             }
 
@@ -54,11 +50,9 @@ public abstract class Sender<T> extends SenderHandler<T> implements ThreadRunMod
             public void complete() {
                 if(messenger != null){
                     messenger.receiverCompeteMessage();
-                    return;
                 }
                 if(receiver != null){
                     receiver.receiverCompeteMessage();
-                    return;
                 }
             }
         };
