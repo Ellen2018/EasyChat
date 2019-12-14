@@ -64,7 +64,7 @@ public abstract class Messenger<T, E> extends MessengerHandler<T,E> implements T
         this.messenger.setSender(sender);
         this.messenger.setHandler(handler);
         this.messenger.setExecutorService(executorService);
-        return this;
+        return this.messenger;
     }
 
     public Receiver setReceiver(Receiver receiver) {

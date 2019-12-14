@@ -21,17 +21,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void test(){
-        final byte data = 3;
+        final String s = "32";
         new Sender<Integer>(){
             @Override
             protected void handlerInstruction(SenderController<Integer> senderController) {
-                Integer data1 = new Integer(data);
-                senderController.sendMessageToNext(data1);
+                senderController.sendMessageToNext(Integer.valueOf(s));
             }
         }
         .runOn(RunMode.REUSABLE_THREAD)
         .setMessenger(new Messenger<Integer,String>() {
-
             @Override
             protected void handleMessage(MessengerSender<String> messengerSender, Integer receiverMessage) {
                 messengerSender.sendMessageToNext(String.valueOf(receiverMessage));
@@ -41,11 +39,21 @@ public class MainActivity extends AppCompatActivity {
             protected void handleErrMessage(MessengerSender<String> messengerSender, Throwable throwable) {
 
             }
-        })
-        .runOn(RunMode.REUSABLE_THREAD)
-        .setReceiver(new Receiver<String>() {
+        }).runOn(RunMode.NEW_THREAD)
+                .setMessenger(new Messenger<String,Integer>() {
+                    @Override
+                    protected void handleMessage(MessengerSender<Integer> messengerSender, String receiverMessage) {
+                        messengerSender.sendMessageToNext(Integer.valueOf(receiverMessage));
+                    }
+
+                    @Override
+                    protected void handleErrMessage(MessengerSender<Integer> messengerSender, Throwable throwable) {
+
+                    }
+        }).runOn(RunMode.NEW_THREAD)
+        .setReceiver(new Receiver<Integer>() {
             @Override
-            protected void handleMessage(String message) {
+            protected void handleMessage(Integer message) {
                 Log.e("Ellen2018","收到消息:"+message);
             }
 

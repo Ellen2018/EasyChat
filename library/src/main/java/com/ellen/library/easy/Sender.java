@@ -1,7 +1,6 @@
 package com.ellen.library.easy;
 
 import android.os.Handler;
-import android.util.Log;
 
 import com.ellen.library.easyinterface.sender.SenderController;
 import com.ellen.library.easyinterface.ThreadRunMode;
