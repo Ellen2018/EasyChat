@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        test();
+        test1();
     }
 
     /**
@@ -92,18 +92,23 @@ public class MainActivity extends AppCompatActivity {
            protected void handlerInstruction() {
                sendMessageToNext("4");
            }
+       }).addParallelSender(new ParallelSender() {
+           @Override
+           protected void handlerInstruction() {
+               sendMessageToNext("5");
+           }
        })
                .setParallelMessgener(new ParallelMessgener() {
            @Override
-           public void handlerMessage(Object message) {
+           public void handlerMessage(String tag,Object message) {
                sendMessage(message);
            }
 
                    @Override
-                   public void handlerMessage(int currentWanChen, int allCount, Object message) {
-                       Log.e("Ellen2018","完成了"+currentWanChen+"/"+allCount+","+message);
+                   public void handlerMessage(int currentWanChen, int allCount,String tag,Object message) {
+                       Log.e("Ellen2018","完成了："+tag+"-"+currentWanChen+"/"+allCount+","+message);
                    }
-               }).runOn(RunMode.REUSABLE_THREAD).setParallelReceiver(new ParallelReceiver() {
+               }).runOn(RunMode.NEW_THREAD).setParallelReceiver(new ParallelReceiver() {
            @Override
            public void handlerMessage(Object message) {
                Log.e("Ellen2018","线程环境:"+Thread.currentThread().getName());

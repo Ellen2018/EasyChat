@@ -24,6 +24,9 @@ public class ParallelMessageManager {
         parallelSendersList.add(parallelSender);
         parallelSender.setParallelSendersList(parallelSendersList);
         parallelSender.setParallelMessageManager(this);
+        if(parallelSender.getTag() == null){
+            parallelSender.setTag("default-task-"+parallelSendersList.size());
+        }
         return parallelSender;
     }
 

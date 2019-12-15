@@ -20,6 +20,22 @@ public abstract class ParallelSender {
     private List<ParallelSender> parallelSendersList;
     private ParallelMessageManager parallelMessageManager;
     private Handler handler = new Handler();
+    private String tag;
+
+    public ParallelSender(String tag){
+        this.tag = tag;
+    }
+
+    public ParallelSender(){
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
 
     void setParallelSendersList(List<ParallelSender> parallelSendersList) {
         this.parallelSendersList = parallelSendersList;
@@ -27,6 +43,9 @@ public abstract class ParallelSender {
 
     public ParallelSender addParallelSender(ParallelSender parallelSender) {
         parallelSendersList.add(parallelSender);
+        if(parallelSender.getTag() == null){
+            parallelSender.setTag("default-task-"+parallelSendersList.size());
+        }
         return this;
     }
 
@@ -64,7 +83,7 @@ public abstract class ParallelSender {
 
     public void sendMessageToNext(Object o) {
         if (parallelMessgener != null) {
-            parallelMessgener.receiverMessage(o);
+            parallelMessgener.receiverMessage(this,o);
         }
         if (parallelReceiver != null) {
             parallelReceiver.receiverMessage(o);
