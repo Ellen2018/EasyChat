@@ -90,10 +90,11 @@ public class MainActivity extends AppCompatActivity {
                }).addParallelSender(new ParallelSender("任务n") {
            @Override
            protected void handlerInstruction() {
-               //sendMessageToNext("4");
-               sendErrMessageToNext(new Throwable("网络问题"));
+               sendMessageToNext("4");
+               //sendErrMessageToNext(new Throwable("网络问题"));
            }
-       }.setReTryTime(8)).addParallelSender(new ParallelSender() {
+       }).setReTryTime(10)
+               .addParallelSender(new ParallelSender() {
            @Override
            protected void handlerInstruction() {
                sendMessageToNext("5");

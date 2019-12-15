@@ -63,7 +63,9 @@ public abstract class ParallelSender {
         if(parallelSender.getTag() == null){
             parallelSender.setTag("default-task-"+parallelSendersList.size());
         }
-        return this;
+        parallelSender.setParallelSendersList(parallelSendersList);
+        parallelSender.setParallelMessageManager(parallelMessageManager);
+        return parallelSender;
     }
 
     public ParallelMessgener setParallelMessgener(ParallelMessgener parallelMessgener) {
