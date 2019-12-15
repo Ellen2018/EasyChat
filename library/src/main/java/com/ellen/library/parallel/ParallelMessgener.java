@@ -21,7 +21,7 @@ public abstract class ParallelMessgener implements ThreadRunMode<ParallelMessgen
     private ParallelMessageManager parallelMessageManager;
     private RunMode runMode = RunMode.CURRENT_THREAD;
     private Handler handler;
-    private ExecutorService executorService = Executors.newFixedThreadPool(1);
+    private ExecutorService executorService = Executors.newFixedThreadPool(5);
     private Hashtable<ParallelSender,Integer> parallelSenderIntegerHashtable;
 
     public ParallelReceiver setParallelReceiver(ParallelReceiver parallelReceiver) {
@@ -87,12 +87,48 @@ public abstract class ParallelMessgener implements ThreadRunMode<ParallelMessgen
         }
     }
 
+    void receiverErrMessage(final ParallelSender parallelSender, final Throwable throwable){
+        if(runMode == RunMode.NEW_THREAD) {
+           new Thread(){
+               @Override
+               public void run() {
+                  handlerErrMessage(parallelSender,throwable);
+               }
+           }.start();
+        }else if(runMode == RunMode.CURRENT_THREAD){
+            handlerErrMessage(parallelSender,throwable);
+        }else if(runMode == RunMode.REUSABLE_THREAD){
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    handlerErrMessage(parallelSender,throwable);
+                }
+            });
+        }else if(runMode == RunMode.MAIN_THREAD){
+           handler.post(new Runnable() {
+               @Override
+               public void run() {
+                   handlerErrMessage(parallelSender,throwable);
+               }
+           });
+        }else {
+            handlerErrMessage(parallelSender,throwable);
+        }
+    }
+
     public abstract void handlerMessage(String tag,Object message);
     public abstract void handlerMessage(int currentWanChen,int allCount,String tag,Object message);
+    public abstract void handlerErrMessage(ParallelSender parallelSender,Throwable throwable);
 
     public void sendMessage(Object message){
         if(parallelReceiver != null){
             parallelReceiver.receiverMessage(message);
+        }
+    }
+
+    public void sendErrMessage(ParallelSender parallelSender,Throwable throwable){
+        if(parallelReceiver != null){
+            parallelReceiver.receiverErrMessage(parallelSender,throwable);
         }
     }
 

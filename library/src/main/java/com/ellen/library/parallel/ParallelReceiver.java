@@ -67,6 +67,35 @@ public abstract class ParallelReceiver implements ThreadRunMode<ParallelReceiver
         }
     }
 
+    void receiverErrMessage(final ParallelSender parallelSender, final Throwable throwable){
+        if (runMode.equals(RunMode.NEW_THREAD)) {
+            new Thread() {
+                @Override
+                public void run() {
+                    handleErrMessage(parallelSender,throwable);
+                }
+            }.start();
+        } else if (runMode.equals(RunMode.CURRENT_THREAD)) {
+            handleErrMessage(parallelSender,throwable);
+        } else if (runMode.equals(RunMode.REUSABLE_THREAD)) {
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    handleErrMessage(parallelSender,throwable);
+                }
+            });
+        } else if (runMode.equals(RunMode.MAIN_THREAD)) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    handleErrMessage(parallelSender,throwable);
+                }
+            });
+        } else {
+            handleErrMessage(parallelSender,throwable);
+        }
+    }
+
     @Override
     public ParallelReceiver runOn(RunMode runMode) {
         this.runMode = runMode;
@@ -74,6 +103,7 @@ public abstract class ParallelReceiver implements ThreadRunMode<ParallelReceiver
     }
 
     public abstract void handlerMessage(Object message);
+    public abstract void handleErrMessage(ParallelSender parallelSender,Throwable throwable);
 
     public void start() {
         if(parallelMessgener != null){

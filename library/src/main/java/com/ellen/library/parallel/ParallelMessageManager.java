@@ -52,4 +52,18 @@ public class ParallelMessageManager {
         }
     }
 
+    void start(final ParallelSender parallelSender){
+        Log.e("Ellen2018","重新请求");
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+               parallelSender.handlerInstruction();
+            }
+        });
+    }
+
+    void test(){
+        Log.e("Ellen2018","重新请求test");
+    }
+
 }

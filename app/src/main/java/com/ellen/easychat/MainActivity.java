@@ -87,34 +87,49 @@ public class MainActivity extends AppCompatActivity {
                    protected void handlerInstruction() {
                       sendMessageToNext("3");
                    }
-               }).addParallelSender(new ParallelSender() {
+               }).addParallelSender(new ParallelSender("任务n") {
            @Override
            protected void handlerInstruction() {
-               sendMessageToNext("4");
+               //sendMessageToNext("4");
+               sendErrMessageToNext(new Throwable("网络问题"));
            }
-       }).addParallelSender(new ParallelSender() {
+       }.setReTryTime(8)).addParallelSender(new ParallelSender() {
            @Override
            protected void handlerInstruction() {
                sendMessageToNext("5");
            }
-       })
-               .setParallelMessgener(new ParallelMessgener() {
+       }).setParallelMessgener(new ParallelMessgener() {
            @Override
-           public void handlerMessage(String tag,Object message) {
+           public void handlerMessage(String tag, Object message) {
+
+           }
+
+           @Override
+           public void handlerMessage(int currentWanChen, int allCount, String tag, Object message) {
+               Log.e("Ellen2018-拦截者","线程环境:"+Thread.currentThread().getName());
+               String jinDu = currentWanChen+"/"+allCount;
+               Log.e("Ellen2018-拦截者",jinDu+":"+message);
                sendMessage(message);
            }
 
-                   @Override
-                   public void handlerMessage(int currentWanChen, int allCount,String tag,Object message) {
-                       Log.e("Ellen2018","完成了："+tag+"-"+currentWanChen+"/"+allCount+","+message);
-                   }
-               }).runOn(RunMode.NEW_THREAD).setParallelReceiver(new ParallelReceiver() {
+           @Override
+           public void handlerErrMessage(ParallelSender parallelSender, Throwable throwable) {
+               Log.e("Ellen2018-拦截者","线程环境:"+Thread.currentThread().getName());
+                Log.e("Ellen2018-拦截者",parallelSender.getTag()+"出现问题:"+throwable.getMessage());
+                sendErrMessage(parallelSender,throwable);
+           }
+       }).setParallelReceiver(new ParallelReceiver() {
            @Override
            public void handlerMessage(Object message) {
-               Log.e("Ellen2018","线程环境:"+Thread.currentThread().getName());
-               Log.e("Ellen2018","接收的消息dsad:"+message);
+               Log.e("Ellen2018-接收者","线程环境:"+Thread.currentThread().getName());
+               Log.e("Ellen2018-接收者","消息:"+message);
            }
 
+           @Override
+           public void handleErrMessage(ParallelSender parallelSender, Throwable throwable) {
+               Log.e("Ellen2018-接收者","线程环境:"+Thread.currentThread().getName());
+               Log.e("Ellen2018-接收者",parallelSender.getTag()+"出现问题:"+throwable.getMessage());
+           }
        }).runOn(RunMode.MAIN_THREAD).start();
     }
 }
