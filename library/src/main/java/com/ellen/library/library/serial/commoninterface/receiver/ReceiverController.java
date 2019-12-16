@@ -1,4 +1,4 @@
-package com.ellen.library.easyinterface.receiver;
+package com.ellen.library.library.serial.commoninterface.receiver;
 
 public abstract class ReceiverController<T> extends ReceiverHandler<T>{
 

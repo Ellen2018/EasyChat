@@ -1,4 +1,4 @@
-package com.ellen.library.runmode;
+package com.ellen.library.library.runmode;
 
 public enum RunMode {
    /**

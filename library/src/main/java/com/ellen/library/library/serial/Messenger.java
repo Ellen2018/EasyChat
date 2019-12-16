@@ -1,11 +1,11 @@
-package com.ellen.library.easy;
+package com.ellen.library.library.serial;
 
 import android.os.Handler;
 
-import com.ellen.library.easyinterface.messenger.MessengerHandler;
-import com.ellen.library.easyinterface.messenger.MessengerSender;
-import com.ellen.library.easyinterface.ThreadRunMode;
-import com.ellen.library.runmode.RunMode;
+import com.ellen.library.library.runmode.RunMode;
+import com.ellen.library.library.runmode.ThreadRunMode;
+import com.ellen.library.library.serial.commoninterface.messenger.MessengerHandler;
+import com.ellen.library.library.serial.commoninterface.messenger.MessengerSender;
 
 import java.util.concurrent.ExecutorService;
 
@@ -201,7 +201,5 @@ public abstract class Messenger<T, E> extends MessengerHandler<T,E> implements T
         return this;
     }
 
-    public void start() {
-        sender.strat();
-    }
+    private void receiver(){}
 }

@@ -1,4 +1,4 @@
-package com.ellen.library.easyinterface.messenger;
+package com.ellen.library.library.serial.commoninterface.messenger;
 
 public interface MessengerSender<E> {
 

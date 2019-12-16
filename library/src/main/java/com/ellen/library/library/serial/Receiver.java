@@ -1,10 +1,10 @@
-package com.ellen.library.easy;
+package com.ellen.library.library.serial;
 
 import android.os.Handler;
 
-import com.ellen.library.easyinterface.ThreadRunMode;
-import com.ellen.library.easyinterface.receiver.ReceiverController;
-import com.ellen.library.runmode.RunMode;
+import com.ellen.library.library.runmode.RunMode;
+import com.ellen.library.library.runmode.ThreadRunMode;
+import com.ellen.library.library.serial.commoninterface.receiver.ReceiverController;
 
 import java.util.concurrent.ExecutorService;
 
@@ -126,6 +126,9 @@ public abstract class Receiver<T> extends ReceiverController<T> implements Threa
         return this;
     }
 
+    /**
+     * 普通开始
+     */
     public void start() {
         sender.strat();
     }

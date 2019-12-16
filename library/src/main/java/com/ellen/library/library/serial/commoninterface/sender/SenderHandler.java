@@ -1,4 +1,4 @@
-package com.ellen.library.easyinterface.sender;
+package com.ellen.library.library.serial.commoninterface.sender;
 
 public abstract class SenderHandler<T> {
     /**

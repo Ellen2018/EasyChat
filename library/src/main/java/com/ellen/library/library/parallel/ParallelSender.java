@@ -1,7 +1,9 @@
-package com.ellen.library.parallel;
+package com.ellen.library.library.parallel;
 
 import android.os.Handler;
 import android.util.Log;
+
+import com.ellen.library.library.parallel.commoninterface.parallelsender.ParallelSenderControl;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -38,12 +40,77 @@ public abstract class ParallelSender {
      */
     private int currentRetryTimes = 0;
     private ExecutorService retryExecutorService = Executors.newFixedThreadPool(1);
+    private ParallelSenderControl senderControl;
 
     public ParallelSender(String tag){
         this.tag = tag;
+        initSenderControl();
     }
 
     public ParallelSender(){
+        initSenderControl();
+    }
+
+    ParallelSenderControl getSenderControl(){
+        return senderControl;
+    }
+
+    private void initSenderControl(){
+        senderControl = new ParallelSenderControl() {
+            @Override
+            public void sendMessageToNext(Object o) {
+                if (parallelMessgener != null) {
+                    parallelMessgener.receiverMessage(ParallelSender.this,o);
+                }
+                if (parallelReceiver != null) {
+                    parallelReceiver.receiverMessage(ParallelSender.this,o);
+                }
+            }
+
+            @Override
+            public void sendErrMessageToNext(Throwable throwable) {
+                if(reTryTime != 0){
+                    if(currentRetryTimes == reTryTime){
+                        //结束重试，并发消息给下一级任务失败
+                        if(parallelMessgener != null){
+                            parallelMessgener.receiverErrMessage(ParallelSender.this,throwable);
+                        }
+                        if(parallelReceiver != null){
+                            parallelReceiver.receiverErrMessage(ParallelSender.this,throwable);
+                        }
+                    }else {
+                        currentRetryTimes++;
+                        Log.e("Ellen2018",tag+"重试次数:"+currentRetryTimes);
+                        //再次提交任务
+                        retryExecutorService.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                ParallelSender.this.handlerInstruction(senderControl);
+                            }
+                        });
+                    }
+                }else {
+                    //直接发送错误消息给下一级任务失败
+                    if(parallelMessgener != null){
+                        parallelMessgener.receiverErrMessage(ParallelSender.this,throwable);
+                    }
+                    if(parallelReceiver != null){
+                        parallelReceiver.receiverErrMessage(ParallelSender.this,throwable);
+                    }
+                }
+            }
+
+            @Override
+            public void sendCompleteMessage(Object message) {
+                if(parallelMessgener != null){
+                  parallelMessgener.receiverComplete(ParallelSender.this,message);
+                }
+                //这里暂时不加
+                if(parallelReceiver != null){
+                   parallelReceiver.receiverCompleteFromSender(ParallelSender.this,message);
+                }
+            }
+        };
     }
 
     public String getTag() {
@@ -98,51 +165,10 @@ public abstract class ParallelSender {
         this.parallelReceiver = parallelReceiver;
     }
 
-    protected abstract void handlerInstruction();
-
-    public void sendMessageToNext(Object o) {
-        if (parallelMessgener != null) {
-            parallelMessgener.receiverMessage(this,o);
-        }
-        if (parallelReceiver != null) {
-            parallelReceiver.receiverMessage(o);
-        }
-    }
+    protected abstract void handlerInstruction(ParallelSenderControl senderControl);
 
     public ParallelSender setReTryTime(int reTryTime) {
         this.reTryTime = reTryTime;
         return this;
-    }
-
-    public void sendErrMessageToNext(Throwable throwable){
-        if(reTryTime != 0){
-            if(currentRetryTimes == reTryTime){
-                //结束重试，并发消息给下一级任务失败
-                if(parallelMessgener != null){
-                    parallelMessgener.receiverErrMessage(this,throwable);
-                }
-                if(parallelReceiver != null){
-                   parallelReceiver.receiverErrMessage(this,throwable);
-                }
-            }else {
-                currentRetryTimes++;
-                Log.e("Ellen2018",tag+"重试次数:"+currentRetryTimes);
-                //再次提交任务
-                retryExecutorService.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                      ParallelSender.this.handlerInstruction();
-                    }
-                });
-            }
-        }else {
-            //直接发送错误消息给下一级任务失败
-            if(parallelMessgener != null){
-                parallelMessgener.receiverErrMessage(this,throwable);
-            }
-            if(parallelReceiver != null){
-                parallelReceiver.receiverErrMessage(this,throwable);
-            }
-        }
     }
 }

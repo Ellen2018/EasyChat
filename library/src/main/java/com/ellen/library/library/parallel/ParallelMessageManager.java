@@ -1,6 +1,4 @@
-package com.ellen.library.parallel;
-
-import android.util.Log;
+package com.ellen.library.library.parallel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +44,7 @@ public class ParallelMessageManager {
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    parallelSender.handlerInstruction();
+                    parallelSender.handlerInstruction(parallelSender.getSenderControl());
                 }
             });
         }

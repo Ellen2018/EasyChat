@@ -1,4 +1,4 @@
-package com.ellen.library.easyinterface.messenger;
+package com.ellen.library.library.serial.commoninterface.messenger;
 
 public abstract class MessengerHandler<T,E> extends MessengerReceiver<T>{
 

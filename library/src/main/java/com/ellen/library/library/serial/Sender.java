@@ -1,11 +1,11 @@
-package com.ellen.library.easy;
+package com.ellen.library.library.serial;
 
 import android.os.Handler;
 
-import com.ellen.library.easyinterface.sender.SenderController;
-import com.ellen.library.easyinterface.ThreadRunMode;
-import com.ellen.library.easyinterface.sender.SenderHandler;
-import com.ellen.library.runmode.RunMode;
+import com.ellen.library.library.runmode.RunMode;
+import com.ellen.library.library.runmode.ThreadRunMode;
+import com.ellen.library.library.serial.commoninterface.sender.SenderController;
+import com.ellen.library.library.serial.commoninterface.sender.SenderHandler;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
