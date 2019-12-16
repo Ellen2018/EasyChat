@@ -92,7 +92,8 @@ public class MainActivity extends AppCompatActivity {
                 String json1 = "网络接口1请求的数据";
                 senderControl.sendCompleteMessage(json1);
             }
-        }).addParallelSender(new ParallelSender("任务2") {
+        }).setReTryTime(5)//可以设置某个任务错误时重试的次数，是不是很人性化呢，哈哈哈
+                .addParallelSender(new ParallelSender("任务2") {
             @Override
             protected void handlerInstruction(ParallelSenderControl senderControl) {
                 //请求接口2..

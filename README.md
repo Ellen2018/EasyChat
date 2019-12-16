@@ -162,7 +162,7 @@ runOn方法中可以传递一个枚举参数，这个枚举的4种类型如下:
 
 ### 场景3:需要请求完3个接口才能更新UI(并行)
 
-     new ParallelMessageManager()
+    new ParallelMessageManager()
                 .addParallelSender(new ParallelSender("任务1") {
             @Override
             protected void handlerInstruction(ParallelSenderControl senderControl) {
@@ -170,7 +170,8 @@ runOn方法中可以传递一个枚举参数，这个枚举的4种类型如下:
                 String json1 = "网络接口1请求的数据";
                 senderControl.sendCompleteMessage(json1);
             }
-        }).addParallelSender(new ParallelSender("任务2") {
+        }).setReTryTime(5)//可以设置某个任务错误时重试的次数，是不是很人性化呢，哈哈哈(调用senderControl.sendErrMessageToNext(...)时触发重试)
+                .addParallelSender(new ParallelSender("任务2") {
             @Override
             protected void handlerInstruction(ParallelSenderControl senderControl) {
                 //请求接口2..
@@ -197,7 +198,7 @@ runOn方法中可以传递一个枚举参数，这个枚举的4种类型如下:
 
             @Override
             public void handleComplete(ParallelSender parallelSender, ParallelMessgengrHandler.TaskProgress taskProgress, Object message) {
-                //上游每发送一条完成的(注意是Complete消息)消息都会调用此方法
+                //上游每发送一条消息都会调用此方法
 
                 //1.如何获取请求的进度
                 String jinDu = taskProgress.getCurrentProgress()+"/"+taskProgress.getTotalProgress();
