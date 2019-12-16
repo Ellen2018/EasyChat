@@ -2,6 +2,8 @@
 
 ## 0.如何导入？
 
+[![](https://jitpack.io/v/Ellen2018/EasyChat.svg)](https://jitpack.io/#Ellen2018/EasyChat)
+
 &emsp;&emsp;首先你需要在项目的build.gradle中配置以下代码：
 
     allprojects {
