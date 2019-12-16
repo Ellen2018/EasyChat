@@ -1,9 +1,7 @@
 > 是否觉得RxJava太难上手呢?不妨使用此库吧，易于理解，易于使用,还能完成RxJava做不到的。这个库的最大好处就是容易理解，并且线程环境易于控制和切换，api也是流式调用类型的。
 
 ## 0.如何导入？
-
 [![](https://jitpack.io/v/Ellen2018/EasyChat.svg)](https://jitpack.io/#Ellen2018/EasyChat)
-
 &emsp;&emsp;首先你需要在项目的build.gradle中配置以下代码：
 
     allprojects {
