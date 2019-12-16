@@ -84,37 +84,61 @@ public class MainActivity extends AppCompatActivity {
      * 并行需求
      */
     public void test1() {
-        new ParallelMessageManager().addParallelSender(new ParallelSender() {
+        new ParallelMessageManager()
+                .addParallelSender(new ParallelSender("任务1") {
             @Override
             protected void handlerInstruction(ParallelSenderControl senderControl) {
-                senderControl.sendMessageToNext("3");
-                senderControl.sendCompleteMessage("完成");
+                //请求接口1..
+                String json1 = "网络接口1请求的数据";
+                senderControl.sendCompleteMessage(json1);
             }
-        }).addParallelSender(new ParallelSender() {
+        }).addParallelSender(new ParallelSender("任务2") {
             @Override
             protected void handlerInstruction(ParallelSenderControl senderControl) {
-                senderControl.sendMessageToNext("4");
-                senderControl.sendCompleteMessage("呵呵哒");
+                //请求接口2..
+                String json2 = "网络接口2请求的数据";
+                senderControl.sendCompleteMessage(json2);
+            }
+        }).addParallelSender(new ParallelSender("任务3") {
+            @Override
+            protected void handlerInstruction(ParallelSenderControl senderControl) {
+                //请求接口3..
+                String json3 = "网络接口3请求的数据";
+                senderControl.sendCompleteMessage(json3);
             }
         }).setParallelReceiver(new ParallelReceiver() {
             @Override
             public void handleMessage(ParallelSender parallelSender, Object message) {
-                Log.e("Ellen2018", "线程工作环境-接收者:" + Thread.currentThread().getName());
-                Log.e("Ellen2018", "收到的消息(来自于" + parallelSender.getTag() + "):" + message);
+              //上游每发送一条消息都会调用此方法
             }
 
             @Override
             public void handleErrMessage(ParallelSender parallelSender, Throwable throwable) {
-                Log.e("Ellen2018", "线程工作环境-接收者:" + Thread.currentThread().getName());
-                Log.e("Ellen2018", "收到错误消息(来自于" + parallelSender.getTag() + "):" + throwable.getMessage());
+                //上游每发送一条错误消息都会调用此方法
             }
 
             @Override
             public void handleComplete(ParallelSender parallelSender, ParallelMessgengrHandler.TaskProgress taskProgress, Object message) {
-                Log.e("Ellen2018", "线程工作环境-接收者:" + Thread.currentThread().getName());
-                Log.e("Ellen2018", "收到完成的消息(来自于" + parallelSender.getTag() + "):"+message);
-                Log.e("Ellen2018", "任务进度是:"+taskProgress.getCurrentProgress()+"/"+taskProgress.getTotalProgress());
+                //上游每发送一条消息都会调用此方法
+
+                //1.如何获取请求的进度
+                String jinDu = taskProgress.getCurrentProgress()+"/"+taskProgress.getTotalProgress();
+
+                //2.如何获取发送过来的消息并处理
+                String json = (String) message;
+                //注意这里区分tag
+                if(parallelSender.getTag().equals("任务1")){
+                    //任务1成功请求到Json的逻辑
+                }else if(parallelSender.getTag().equals("任务2")){
+                    //任务2成功请求到Json的逻辑
+                }else if(parallelSender.getTag().equals("任务3")){
+                    //任务3成功请求到Json的逻辑
+                }
             }
-        }).runOn(RunMode.MAIN_THREAD).start();
+        })
+                //使Receiver的处理全部在主线程(UI线程)
+                .runOn(RunMode.MAIN_THREAD)
+                //千万别忘记调用start
+                .start();
     }
 }
