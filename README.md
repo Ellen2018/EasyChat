@@ -198,7 +198,7 @@ runOn方法中可以传递一个枚举参数，这个枚举的4种类型如下:
 
             @Override
             public void handleComplete(ParallelSender parallelSender, ParallelMessgengrHandler.TaskProgress taskProgress, Object message) {
-                //上游每发送一条消息都会调用此方法
+                //上游每发送一条消息(注意是Complete消息)都会调用此方法
 
                 //1.如何获取请求的进度
                 String jinDu = taskProgress.getCurrentProgress()+"/"+taskProgress.getTotalProgress();
