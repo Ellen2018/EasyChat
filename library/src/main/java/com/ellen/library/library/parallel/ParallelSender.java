@@ -80,7 +80,6 @@ public abstract class ParallelSender {
                         }
                     }else {
                         currentRetryTimes++;
-                        Log.e("Ellen2018",tag+"重试次数:"+currentRetryTimes);
                         //再次提交任务
                         retryExecutorService.submit(new Runnable() {
                             @Override
